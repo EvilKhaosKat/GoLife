@@ -48,7 +48,7 @@ func launchLife() {
 	for {
 		updateTheWorld(gameMap)
 
-		<-timer
+		<-timer //wait until timer expire, usually longer than updateTheWorld
 		timer.Reset(DELAY_MS)
 	}
 

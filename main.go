@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const DELAY_MS = 200
+const DELAY_MS = 200 * time.Millisecond
 //const ALIVE_CELL =
 //const DEAD_CELL =
 

@@ -67,6 +67,7 @@ func (gameMap *GameMap) addChange(height, width int, newValue bool) {
 	//TODO concurrent safety to be added
 	changeEvents := gameMap.changeEvents
 	changeEvents = append(changeEvents, ChangeEvent{height, width, newValue})
+	gameMap.changeEvents = changeEvents
 }
 
 func cellContinueToLive(aliveNeighboursCount int) bool {

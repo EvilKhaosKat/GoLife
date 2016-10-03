@@ -5,13 +5,13 @@ import (
 	// "github.com/gdamore/tcell"
 	// "time"
 	// "os"
-	"fmt"
 	"math/rand"
 	"time"
 )
 
 const DELAY_MS = 200
-
+//const ALIVE_CELL =
+//const DEAD_CELL =
 
 
 func main() {
@@ -40,13 +40,13 @@ func main() {
 
 func launchLife() {
 	gameMap := initGameMap(termbox.Size())
-	fmt.Println(gameMap)
+	fillMapRandomValues(gameMap)
+	printGameMap(gameMap)
 
-
-	termbox.SetCell(5, 10, '⏣', termbox.ColorWhite, termbox.ColorBlack)
-	termbox.SetCell(1, 2, '⏺', termbox.ColorWhite, termbox.ColorBlack)
-	termbox.SetCell(10, 5, '⏹', termbox.ColorWhite, termbox.ColorBlack)
-	termbox.Flush()
+	//termbox.SetCell(5, 10, '⏣', termbox.ColorWhite, termbox.ColorBlack)
+	//termbox.SetCell(1, 2, '⏺', termbox.ColorWhite, termbox.ColorBlack)
+	//termbox.SetCell(10, 5, '⏹', termbox.ColorWhite, termbox.ColorBlack)
+	//termbox.Flush()
 }
 
 func initGameMap(width, height int) *GameMap {
@@ -72,10 +72,27 @@ func fillMapRandomValues(gameMap *GameMap) {
 }
 
 func getRandomBoolValue() bool {
-	randomValue := rand.Intn(2) //0 or 1
+	randomValue := rand.Intn(7)
 	return randomValue == 0
 }
 
 func printGameMap(gameMap *GameMap) {
-	
+	height, width := gameMap.getSize()
+
+	for i := 0; i < height; i++ {
+		for j := 0; j < width; j++ {
+			cellAlive := gameMap.getValue(i, j)
+			printGameMapCell(i, j, cellAlive)
+		}
+	}
+
+	termbox.Flush()
+}
+
+func printGameMapCell(height, width int, cellAlive bool) {
+	if cellAlive {
+		termbox.SetCell(height, width, '█', termbox.ColorWhite, termbox.ColorBlack)
+	} else {
+		termbox.SetCell(height, width, '█', termbox.ColorBlack, termbox.ColorWhite)
+	}
 }

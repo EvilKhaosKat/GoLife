@@ -6,34 +6,13 @@ import (
 	// "time"
 	// "os"
 	"fmt"
+	"math/rand"
+	"time"
 )
 
 const DELAY_MS = 200
 
-type GameMap struct {
-	cellMap      [][]bool
-	changeEvents []ChangeEvent
 
-}
-
-func (gameMap *GameMap) getSize() (int, int) {
-	height := len(gameMap)
-	if height == 0 {
-		panic("Height must not be 0")
-	}
-
-	width := len(gameMap[0])
-	if width == 0 {
-		panic("Width must not be 0")
-	}
-
-	return height, width
-}
-
-type ChangeEvent struct {
-	x,y int
-	newValue bool
-}
 
 func main() {
 	err := termbox.Init()
@@ -81,5 +60,22 @@ func initGameMap(width, height int) *GameMap {
 }
 
 func fillMapRandomValues(gameMap *GameMap) {
+	rand.Seed(time.Now().UTC().UnixNano())
 
+	height, width := gameMap.getSize()
+
+	for i := 0; i < height; i++ {
+		for j := 0; j < width; j++ {
+			gameMap.setValue(i, j, getRandomBoolValue())
+		}
+	}
+}
+
+func getRandomBoolValue() bool {
+	randomValue := rand.Intn(2) //0 or 1
+	return randomValue == 0
+}
+
+func printGameMap(gameMap *GameMap) {
+	
 }

@@ -10,9 +10,6 @@ import (
 )
 
 const DELAY_MS = 200 * time.Millisecond
-//const ALIVE_CELL =
-//const DEAD_CELL =
-
 
 func main() {
 	err := termbox.Init()
@@ -43,15 +40,13 @@ func launchLife() {
 	fillMapRandomValues(gameMap)
 	printGameMap(gameMap)
 
-	//timer := time.NewTimer(DELAY_MS)
+	timer := time.NewTimer(DELAY_MS)
 
 	for {
-		//timer := time.NewTimer(DELAY_MS)
 		gameMap.Update()
-		time.Sleep(DELAY_MS)
 
-		//<-timer.C //wait until timer expire, usually longer than updateTheWorld
-		//timer.Reset(DELAY_MS)
+		<-timer.C //wait until timer expire, usually longer than updateTheWorld
+		timer.Reset(DELAY_MS)
 
 		printGameMap(gameMap)
 	}

@@ -43,10 +43,23 @@ func launchLife() {
 	fillMapRandomValues(gameMap)
 	printGameMap(gameMap)
 
+	timer := time.NewTimer(DELAY_MS)
+
+	for {
+		updateTheWorld(gameMap)
+
+		<-timer
+		timer.Reset(DELAY_MS)
+	}
+
 	//termbox.SetCell(5, 10, '⏣', termbox.ColorWhite, termbox.ColorBlack)
 	//termbox.SetCell(1, 2, '⏺', termbox.ColorWhite, termbox.ColorBlack)
 	//termbox.SetCell(10, 5, '⏹', termbox.ColorWhite, termbox.ColorBlack)
 	//termbox.Flush()
+}
+func updateTheWorld(gameMap *GameMap) {
+	gameMap.Update()
+	printGameMap(gameMap)
 }
 
 func initGameMap(width, height int) *GameMap {
@@ -62,11 +75,11 @@ func initGameMap(width, height int) *GameMap {
 func fillMapRandomValues(gameMap *GameMap) {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	height, width := gameMap.getSize()
+	height, width := gameMap.GetSize()
 
 	for i := 0; i < height; i++ {
 		for j := 0; j < width; j++ {
-			gameMap.setValue(i, j, getRandomBoolValue())
+			gameMap.SetValue(i, j, getRandomBoolValue())
 		}
 	}
 }
@@ -77,11 +90,11 @@ func getRandomBoolValue() bool {
 }
 
 func printGameMap(gameMap *GameMap) {
-	height, width := gameMap.getSize()
+	height, width := gameMap.GetSize()
 
 	for i := 0; i < height; i++ {
 		for j := 0; j < width; j++ {
-			cellAlive := gameMap.getValue(i, j)
+			cellAlive := gameMap.GetValue(i, j)
 			printGameMapCell(i, j, cellAlive)
 		}
 	}

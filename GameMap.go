@@ -5,7 +5,7 @@ type GameMap struct {
 	changeEvents []ChangeEvent
 }
 
-func (gameMap *GameMap) getSize() (int, int) {
+func (gameMap *GameMap) GetSize() (int, int) {
 	height := len(gameMap.cellMap)
 	if height == 0 {
 		panic("Height must not be 0")
@@ -19,16 +19,26 @@ func (gameMap *GameMap) getSize() (int, int) {
 	return height, width
 }
 
-func (gameMap *GameMap) setValue(height, width int, value bool) {
+func (gameMap *GameMap) SetValue(height, width int, value bool) {
 	gameMap.cellMap[height][width] = value
 }
 
-func (gameMap *GameMap) getValue(height, width int) bool {
+func (gameMap *GameMap) GetValue(height, width int) bool {
 	return gameMap.cellMap[height][width]
 }
 
-func (gameMap *GameMap) doForEveryCell(f func (height, width int, gameMap *GameMap)) {
-	height, width := gameMap.getSize()
+func (gameMap *GameMap) Update() {
+	height, width := gameMap.GetSize()
+
+	for i := 0; i < height; i++ {
+		for j := 0; j < width; j++ {
+			f(i, j, gameMap)
+		}
+	}
+}
+
+func (gameMap *GameMap) DoForEveryCell(f func (height, width int, gameMap *GameMap)) {
+	height, width := gameMap.GetSize()
 
 	for i := 0; i < height; i++ {
 		for j := 0; j < width; j++ {

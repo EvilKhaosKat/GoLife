@@ -33,6 +33,7 @@ func (gameMap *GameMap) GetValue(height, width int) bool {
 	return gameMap.cellMap[height][width]
 }
 
+//simple linear algorithm
 func (gameMap *GameMap) Update() {
 	height, width := gameMap.GetSize()
 
@@ -43,15 +44,29 @@ func (gameMap *GameMap) Update() {
 			cellAlive := gameMap.GetValue(i, j)
 			if cellAlive {
 				if !cellContinueToLive(aliveNeighboursCount) {
-					gameMap.SetValue(i, j, false)
+					gameMap.addChange(i, j, false)
 				}
 			} else {
 				if aliveNeighboursCount == 3 {
-					gameMap.SetValue(i, j, true)
+					gameMap.addChange(i, j, true)
 				}
 			}
 		}
 	}
+
+	gameMap.performAllChanges()
+}
+
+func (gameMap *GameMap) performAllChanges() {
+	for _, changeEvent := range gameMap.changeEvents {
+		gameMap.SetValue(changeEvent.height, changeEvent.width, changeEvent.newValue)
+	}
+}
+
+func (gameMap *GameMap) addChange(height, width int, newValue bool) {
+	//TODO concurrent safety to be added
+	changeEvents := gameMap.changeEvents
+	changeEvents = append(changeEvents, ChangeEvent{height, width, newValue})
 }
 
 func cellContinueToLive(aliveNeighboursCount int) bool {
@@ -63,7 +78,7 @@ func (gameMap *GameMap) getAliveNeighboursCount(height, width int) int {
 
 	aliveNeighboursCount := 0
 
-	for cellAlive := range neighbours {
+	for _, cellAlive := range neighbours {
 		if cellAlive {
 			aliveNeighboursCount++
 		}
@@ -73,7 +88,7 @@ func (gameMap *GameMap) getAliveNeighboursCount(height, width int) int {
 }
 
 func (gameMap *GameMap) getCellNeighbours(height, width int) []bool {
-	var neighbours []*bool
+	var neighbours []bool
 
 	neighbours = gameMap.addNeighbour(neighbours, height - 1, width - 1)
 	neighbours = gameMap.addNeighbour(neighbours, height - 1, width)
@@ -88,7 +103,7 @@ func (gameMap *GameMap) getCellNeighbours(height, width int) []bool {
 
 	return neighbours
 }
-func (gameMap *GameMap)addNeighbour(neighbours []*bool, height, width int) []*bool {
+func (gameMap *GameMap)addNeighbour(neighbours []bool, height, width int) []bool {
 	mapHeight, mapWidth := gameMap.GetSize()
 
 	possibleHeight := checkPossibleValue(mapHeight, height)
@@ -100,7 +115,7 @@ func (gameMap *GameMap)addNeighbour(neighbours []*bool, height, width int) []*bo
 
 	return neighbours
 }
-func checkPossibleValue(basicValue int, checkValue int) int {
+func checkPossibleValue(basicValue int, checkValue int) bool {
 	return checkValue > 0 && checkValue < basicValue
 }
 
@@ -115,6 +130,6 @@ func (gameMap *GameMap) DoForEveryCell(f func(height, width int, gameMap *GameMa
 }
 
 type ChangeEvent struct {
-	x, y     int
-	newValue bool
+	height, width int
+	newValue      bool
 }

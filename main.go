@@ -43,23 +43,23 @@ func launchLife() {
 	fillMapRandomValues(gameMap)
 	printGameMap(gameMap)
 
-	timer := time.NewTimer(DELAY_MS)
+	//timer := time.NewTimer(DELAY_MS)
 
 	for {
-		updateTheWorld(gameMap)
+		//timer := time.NewTimer(DELAY_MS)
+		gameMap.Update()
+		time.Sleep(DELAY_MS)
 
-		<-timer //wait until timer expire, usually longer than updateTheWorld
-		timer.Reset(DELAY_MS)
+		//<-timer.C //wait until timer expire, usually longer than updateTheWorld
+		//timer.Reset(DELAY_MS)
+
+		printGameMap(gameMap)
 	}
 
 	//termbox.SetCell(5, 10, '⏣', termbox.ColorWhite, termbox.ColorBlack)
 	//termbox.SetCell(1, 2, '⏺', termbox.ColorWhite, termbox.ColorBlack)
 	//termbox.SetCell(10, 5, '⏹', termbox.ColorWhite, termbox.ColorBlack)
 	//termbox.Flush()
-}
-func updateTheWorld(gameMap *GameMap) {
-	gameMap.Update()
-	printGameMap(gameMap)
 }
 
 func initGameMap(width, height int) *GameMap {
@@ -85,7 +85,7 @@ func fillMapRandomValues(gameMap *GameMap) {
 }
 
 func getRandomBoolValue() bool {
-	randomValue := rand.Intn(7)
+	randomValue := rand.Intn(10)
 	return randomValue == 0
 }
 

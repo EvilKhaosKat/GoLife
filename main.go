@@ -58,10 +58,10 @@ func launchLife() {
 }
 
 func initGameMap(width, height int) *GameMap {
-	cellAutoMap := make([][]bool, height)
+	cellAutoMap := make([][]bool, width)
 
-	for i := 0; i < height; i++ {
-		cellAutoMap[i] = make([]bool, width)
+	for i := 0; i < width; i++ {
+		cellAutoMap[i] = make([]bool, height)
 	}
 
 	return &GameMap{cellMap: cellAutoMap}

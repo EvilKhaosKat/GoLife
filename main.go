@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const DELAY_MS = 200 * time.Millisecond
+const DELAY_MS = 150 * time.Millisecond
 
 func main() {
 	err := termbox.Init()

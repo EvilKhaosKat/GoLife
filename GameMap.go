@@ -12,33 +12,33 @@ type GameMap struct {
 }
 
 func (gameMap *GameMap) GetSize() (int, int) {
-	height := len(gameMap.cellMap)
-	if height == 0 {
-		panic("Height must not be 0")
-	}
-
-	width := len(gameMap.cellMap[0])
+	width := len(gameMap.cellMap)
 	if width == 0 {
 		panic("Width must not be 0")
 	}
 
-	return height, width
+	height := len(gameMap.cellMap[0])
+	if height == 0 {
+		panic("Height must not be 0")
+	}
+
+	return width, height
 }
 
-func (gameMap *GameMap) SetValue(height, width int, value bool) {
-	gameMap.cellMap[height][width] = value
+func (gameMap *GameMap) SetValue(width, height int, value bool) {
+	gameMap.cellMap[width][height] = value
 }
 
-func (gameMap *GameMap) GetValue(height, width int) bool {
-	return gameMap.cellMap[height][width]
+func (gameMap *GameMap) GetValue(width, height int) bool {
+	return gameMap.cellMap[width][height]
 }
 
 //simple linear algorithm
 func (gameMap *GameMap) Update() {
-	height, width := gameMap.GetSize()
+	width, height := gameMap.GetSize()
 
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
+	for i := 0; i < width; i++ {
+		for j := 0; j < height; j++ {
 			aliveNeighboursCount := gameMap.getAliveNeighboursCount(i, j)
 
 			cellAlive := gameMap.GetValue(i, j)
@@ -59,14 +59,14 @@ func (gameMap *GameMap) Update() {
 
 func (gameMap *GameMap) performAllChanges() {
 	for _, changeEvent := range gameMap.changeEvents {
-		gameMap.SetValue(changeEvent.height, changeEvent.width, changeEvent.newValue)
+		gameMap.SetValue(changeEvent.width, changeEvent.height, changeEvent.newValue)
 	}
 }
 
-func (gameMap *GameMap) addChange(height, width int, newValue bool) {
+func (gameMap *GameMap) addChange(width, height int, newValue bool) {
 	//TODO concurrent safety to be added
 	changeEvents := gameMap.changeEvents
-	changeEvents = append(changeEvents, ChangeEvent{height, width, newValue})
+	changeEvents = append(changeEvents, ChangeEvent{width, height, newValue})
 	gameMap.changeEvents = changeEvents
 }
 
@@ -74,8 +74,8 @@ func cellContinueToLive(aliveNeighboursCount int) bool {
 	return aliveNeighboursCount == 2 || aliveNeighboursCount == 3
 }
 
-func (gameMap *GameMap) getAliveNeighboursCount(height, width int) int {
-	neighbours := gameMap.getCellNeighbours(height, width)
+func (gameMap *GameMap) getAliveNeighboursCount(width, height int) int {
+	neighbours := gameMap.getCellNeighbours(width, height)
 
 	aliveNeighboursCount := 0
 
@@ -88,30 +88,30 @@ func (gameMap *GameMap) getAliveNeighboursCount(height, width int) int {
 	return aliveNeighboursCount
 }
 
-func (gameMap *GameMap) getCellNeighbours(height, width int) []bool {
+func (gameMap *GameMap) getCellNeighbours(width, height int) []bool {
 	var neighbours []bool
 
-	neighbours = gameMap.addNeighbour(neighbours, height - 1, width - 1)
-	neighbours = gameMap.addNeighbour(neighbours, height - 1, width)
-	neighbours = gameMap.addNeighbour(neighbours, height - 1, width + 1)
+	neighbours = gameMap.addNeighbour(neighbours, width-1, height - 1)
+	neighbours = gameMap.addNeighbour(neighbours, width-1, height)
+	neighbours = gameMap.addNeighbour(neighbours, width-1, height + 1)
 
-	neighbours = gameMap.addNeighbour(neighbours, height, width - 1)
-	neighbours = gameMap.addNeighbour(neighbours, height, width + 1)
+	neighbours = gameMap.addNeighbour(neighbours, width, height - 1)
+	neighbours = gameMap.addNeighbour(neighbours, width, height + 1)
 
-	neighbours = gameMap.addNeighbour(neighbours, height + 1, width - 1)
-	neighbours = gameMap.addNeighbour(neighbours, height + 1, width)
-	neighbours = gameMap.addNeighbour(neighbours, height + 1, width + 1)
+	neighbours = gameMap.addNeighbour(neighbours, width + 1, height - 1)
+	neighbours = gameMap.addNeighbour(neighbours, width + 1, height)
+	neighbours = gameMap.addNeighbour(neighbours, width + 1, height + 1)
 
 	return neighbours
 }
-func (gameMap *GameMap)addNeighbour(neighbours []bool, height, width int) []bool {
-	mapHeight, mapWidth := gameMap.GetSize()
+func (gameMap *GameMap) addNeighbour(neighbours []bool, width, height int) []bool {
+	mapWidth, mapHeight := gameMap.GetSize()
 
 	possibleHeight := checkPossibleValue(mapHeight, height)
 	possibleWidth := checkPossibleValue(mapWidth, width)
 
 	if possibleHeight && possibleWidth {
-		neighbours = append(neighbours, gameMap.GetValue(height, width)) //TODO not efficient copying of array
+		neighbours = append(neighbours, gameMap.GetValue(width, height)) //TODO not efficient copying of array
 	}
 
 	return neighbours
@@ -120,7 +120,7 @@ func checkPossibleValue(basicValue int, checkValue int) bool {
 	return checkValue > 0 && checkValue < basicValue
 }
 
-func (gameMap *GameMap) DoForEveryCell(f func(height, width int, gameMap *GameMap)) {
+func (gameMap *GameMap) DoForEveryCell(f func(width, height int, gameMap *GameMap)) {
 	height, width := gameMap.GetSize()
 
 	for i := 0; i < height; i++ {
@@ -131,6 +131,6 @@ func (gameMap *GameMap) DoForEveryCell(f func(height, width int, gameMap *GameMa
 }
 
 type ChangeEvent struct {
-	height, width int
+	width, height int
 	newValue      bool
 }

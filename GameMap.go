@@ -124,7 +124,7 @@ func (gameMap *GameMap) addNeighbour(neighbours []bool, width, height int) []boo
 }
 
 func checkPossibleValue(basicValue int, checkValue int) bool {
-	return checkValue > 0 && checkValue < basicValue
+	return checkValue >= 0 && checkValue < basicValue
 }
 
 func (gameMap *GameMap) DoForEveryCell(f func(width, height int, gameMap *GameMap)) {

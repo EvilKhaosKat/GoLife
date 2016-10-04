@@ -10,12 +10,12 @@ func TestEmptyMap(t *testing.T) {
 	gameMap := initGameMap(SIZE, SIZE)
 
 	if !isMapEmpty(gameMap) {
-		t.Error("GameMap must be empty, but it is:", gameMap)
+		t.Error("GameMap must be empty, but it isn't:", gameMap)
 	}
 
 	gameMap.Update()
 	if !isMapEmpty(gameMap) {
-		t.Error("GameMap must be empty, but it is:", gameMap)
+		t.Error("GameMap must be empty, but it isn't:", gameMap)
 	}
 }
 
@@ -40,7 +40,7 @@ func TestCellBecomeAlive(t *testing.T) {
 	//00000
 
 	if !gameMap.GetValue(2, 2) {
-		t.Error("Cell 2,3 must be alive, but it doesn't:", gameMap)
+		t.Error("Cell 2,3 must be alive, but it isn't:", gameMap)
 	}
 }
 
@@ -66,6 +66,30 @@ func TestCellDiesNoNeighbours(t *testing.T) {
 	}
 }
 
+func TestCellBecomeAliveCornerCase(t *testing.T) {
+	gameMap := initGameMap(SIZE, SIZE)
+
+	gameMap.SetValue(1, 0, true)
+	gameMap.SetValue(1, 1, true)
+	gameMap.SetValue(0, 1, true)
+	//01000
+	//11000
+	//00000
+	//00000
+	//00000
+
+	gameMap.Update()
+	//11000
+	//11000
+	//00000
+	//00000
+	//00000
+
+	if !gameMap.GetValue(0, 0) {
+		t.Error("Cell 0,0 must be alive, but it isn't:", gameMap)
+	}
+}
+
 func TestSimpleOscillator(t *testing.T) {
 	gameMap := initGameMap(SIZE, SIZE)
 
@@ -78,7 +102,6 @@ func TestSimpleOscillator(t *testing.T) {
 	//00000
 	//00000
 
-
 	gameMap.Update()
 	//00000
 	//00100
@@ -89,7 +112,7 @@ func TestSimpleOscillator(t *testing.T) {
 	if !gameMap.GetValue(2, 1) ||
 		!gameMap.GetValue(2, 2) ||
 		!gameMap.GetValue(2, 3) {
-		t.Error("Oscillator must be vertical, but it doesn't:", gameMap)
+		t.Error("Oscillator must be vertical, but it isn't:", gameMap)
 	}
 }
 

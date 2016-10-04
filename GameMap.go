@@ -1,5 +1,9 @@
 package main
 
+import (
+	"bytes"
+)
+
 // Game map.
 // Coordinates formatted as:
 // 0123
@@ -128,6 +132,27 @@ func (gameMap *GameMap) DoForEveryCell(f func(width, height int, gameMap *GameMa
 			f(i, j, gameMap)
 		}
 	}
+}
+
+func (gameMap *GameMap)String() string{
+	var buffer bytes.Buffer
+
+	width, height := gameMap.GetSize()
+
+	for i := 0; i < width; i++ {
+		for j := 0; j < height; j++ {
+			cellAlive := gameMap.GetValue(i, j)
+			if cellAlive {
+				buffer.WriteString("1")
+			} else {
+				buffer.WriteString("0")
+			}
+		}
+		buffer.WriteByte(13)
+		buffer.WriteByte(10)
+	}
+
+	return buffer.String()
 }
 
 type ChangeEvent struct {

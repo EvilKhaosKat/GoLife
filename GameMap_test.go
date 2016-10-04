@@ -38,8 +38,31 @@ func TestCellBecomeAlive(t *testing.T) {
 	//00100
 	//00000
 	//00000
+
 	if !gameMap.GetValue(2, 2) {
 		t.Error("Cell 2,3 must be alive, but it doesn't:", gameMap)
+	}
+}
+
+func TestCellDiesNoNeighbours(t *testing.T) {
+	gameMap := initGameMap(SIZE, SIZE)
+
+	gameMap.SetValue(2, 2, true)
+	//00000
+	//00000
+	//00100
+	//00000
+	//00000
+
+	gameMap.Update()
+	//00000
+	//00000
+	//00000
+	//00000
+	//00000
+
+	if gameMap.GetValue(2, 2) {
+		t.Error("Cell 2,3 must be dead, but it doesn't:", gameMap)
 	}
 }
 
@@ -62,6 +85,7 @@ func TestSimpleOscillator(t *testing.T) {
 	//00100
 	//00100
 	//00000
+
 	if !gameMap.GetValue(2, 1) ||
 		!gameMap.GetValue(2, 2) ||
 		!gameMap.GetValue(2, 3) {

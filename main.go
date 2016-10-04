@@ -63,11 +63,6 @@ func launchLife(finishGame chan bool) {
 			printGameMap(gameMap)
 		}
 	}
-
-	//termbox.SetCell(5, 10, '⏣', termbox.ColorWhite, termbox.ColorBlack)
-	//termbox.SetCell(1, 2, '⏺', termbox.ColorWhite, termbox.ColorBlack)
-	//termbox.SetCell(10, 5, '⏹', termbox.ColorWhite, termbox.ColorBlack)
-	//termbox.Flush()
 }
 
 func initGameMap(width, height int) *GameMap {

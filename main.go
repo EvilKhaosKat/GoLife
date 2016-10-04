@@ -18,37 +18,50 @@ func main() {
 	}
 	defer termbox.Close()
 
-	go launchLife()
+	finishGame := make(chan bool)
 
+	go handleTerminalEvents(finishGame)
+	launchLife(finishGame)
+}
+
+func handleTerminalEvents(finishGame chan bool) {
 	//wait for esc or ctrl+q pressed, and then exit
-	loop:
+	terminalEventsLoop:
 	for {
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
 			if ev.Key == termbox.KeyEsc ||
 				ev.Key == termbox.KeyCtrlQ {
-				break loop
+				break terminalEventsLoop
 			}
 		case termbox.EventError:
 			panic(ev.Err)
 		}
 	}
+
+	finishGame <- true
 }
 
-func launchLife() {
+func launchLife(finishGame chan bool) {
 	gameMap := initGameMap(termbox.Size())
 	fillMapRandomValues(gameMap)
 	printGameMap(gameMap)
 
 	timer := time.NewTimer(DELAY_MS)
 
+	lifeLoop:
 	for {
-		gameMap.Update()
+		select {
+		case <-finishGame:
+			break lifeLoop
+		default:
+			gameMap.Update()
 
-		<-timer.C //wait until timer expire, usually longer than updateTheWorld
-		timer.Reset(DELAY_MS)
+			<-timer.C //wait until timer expire, usually longer than map update
+			timer.Reset(DELAY_MS)
 
-		printGameMap(gameMap)
+			printGameMap(gameMap)
+		}
 	}
 
 	//termbox.SetCell(5, 10, '⏣', termbox.ColorWhite, termbox.ColorBlack)
@@ -85,7 +98,7 @@ func getRandomBoolValue() bool {
 }
 
 func printGameMap(gameMap *GameMap) {
-	width, height  := gameMap.GetSize()
+	width, height := gameMap.GetSize()
 
 	for i := 0; i < width; i++ {
 		for j := 0; j < height; j++ {

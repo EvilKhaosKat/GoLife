@@ -24,8 +24,8 @@ func TestCellBecomeAlive(t *testing.T) {
 	gameMap := initGameMap(SIZE, SIZE)
 
 	gameMap.SetValue(2, 1, true)
-	gameMap.SetValue(1, 4, true)
-	gameMap.SetValue(3, 4, true)
+	gameMap.SetValue(1, 3, true)
+	gameMap.SetValue(3, 3, true)
 	//00000
 	//00100
 	//00!00

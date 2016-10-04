@@ -58,10 +58,10 @@ func launchLife() {
 }
 
 func initGameMap(width, height int) *GameMap {
-	cellAutoMap := make([][]bool, width)
+	cellAutoMap := make([][]bool, height)
 
-	for i := 0; i < width; i++ {
-		cellAutoMap[i] = make([]bool, height)
+	for i := 0; i < height; i++ {
+		cellAutoMap[i] = make([]bool, width)
 	}
 
 	return &GameMap{cellMap: cellAutoMap}
@@ -70,10 +70,10 @@ func initGameMap(width, height int) *GameMap {
 func fillMapRandomValues(gameMap *GameMap) {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	height, width := gameMap.GetSize()
+	width, height := gameMap.GetSize()
 
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
+	for i := 0; i < width; i++ {
+		for j := 0; j < height; j++ {
 			gameMap.SetValue(i, j, getRandomBoolValue())
 		}
 	}
@@ -85,10 +85,10 @@ func getRandomBoolValue() bool {
 }
 
 func printGameMap(gameMap *GameMap) {
-	height, width := gameMap.GetSize()
+	width, height  := gameMap.GetSize()
 
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
+	for i := 0; i < width; i++ {
+		for j := 0; j < height; j++ {
 			cellAlive := gameMap.GetValue(i, j)
 			printGameMapCell(i, j, cellAlive)
 		}

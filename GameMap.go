@@ -169,10 +169,10 @@ func checkPossibleValue(basicValue int, checkValue int) bool {
 }
 
 func (gameMap *GameMap) DoForEveryCell(f func(width, height int, gameMap *GameMap)) {
-	height, width := gameMap.GetSize()
+	width, height := gameMap.GetSize()
 
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
+	for i := 0; i < width; i++ {
+		for j := 0; j < height; j++ {
 			f(i, j, gameMap)
 		}
 	}

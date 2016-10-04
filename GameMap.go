@@ -43,7 +43,7 @@ func (gameMap *GameMap) Update() {
 
 	for i := 0; i < width; i++ {
 		for j := 0; j < height; j++ {
-			aliveNeighboursCount := gameMap.getAliveNeighboursCount(i, j)
+			aliveNeighboursCount := gameMap.getAliveNeighboursCountEff(i, j)
 
 			cellAlive := gameMap.GetValue(i, j)
 			if cellAlive {
@@ -79,6 +79,45 @@ func cellContinueToLive(aliveNeighboursCount int) bool {
 	return aliveNeighboursCount == 2 || aliveNeighboursCount == 3
 }
 
+func (gameMap *GameMap) getAliveNeighboursCountEff(width, height int) int {
+	aliveNeighbours := 0
+
+	aliveNeighbours += oneIfTrue(gameMap.isNeighbourAlive(width - 1, height - 1))
+	aliveNeighbours += oneIfTrue(gameMap.isNeighbourAlive(width - 1, height))
+	aliveNeighbours += oneIfTrue(gameMap.isNeighbourAlive(width - 1, height + 1))
+
+	aliveNeighbours += oneIfTrue(gameMap.isNeighbourAlive(width, height - 1))
+	aliveNeighbours += oneIfTrue(gameMap.isNeighbourAlive(width, height + 1))
+
+	aliveNeighbours += oneIfTrue(gameMap.isNeighbourAlive(width + 1, height - 1))
+	aliveNeighbours += oneIfTrue(gameMap.isNeighbourAlive(width + 1, height))
+	aliveNeighbours += oneIfTrue(gameMap.isNeighbourAlive(width + 1, height + 1))
+
+	return aliveNeighbours
+}
+
+func oneIfTrue(is bool) int {
+	if is {
+		return 1
+	} else {
+		return 0
+	}
+}
+
+func (gameMap *GameMap) isNeighbourAlive(width, height int) bool {
+	mapWidth, mapHeight := gameMap.GetSize()
+
+	possibleHeight := checkPossibleValue(mapHeight, height)
+	possibleWidth := checkPossibleValue(mapWidth, width)
+
+	if possibleHeight && possibleWidth {
+		return gameMap.GetValue(width, height)
+	}
+
+	return false
+}
+
+//obsolete code
 func (gameMap *GameMap) getAliveNeighboursCount(width, height int) int {
 	neighbours := gameMap.getCellNeighbours(width, height)
 
@@ -93,6 +132,7 @@ func (gameMap *GameMap) getAliveNeighboursCount(width, height int) int {
 	return aliveNeighboursCount
 }
 
+//obsolete code
 func (gameMap *GameMap) getCellNeighbours(width, height int) []bool {
 	var neighbours []bool
 
@@ -110,6 +150,7 @@ func (gameMap *GameMap) getCellNeighbours(width, height int) []bool {
 	return neighbours
 }
 
+//obsolete code
 func (gameMap *GameMap) addNeighbour(neighbours []bool, width, height int) []bool {
 	mapWidth, mapHeight := gameMap.GetSize()
 

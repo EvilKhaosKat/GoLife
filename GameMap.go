@@ -2,11 +2,7 @@ package main
 
 import (
 	"bytes"
-	"sync"
-	"runtime"
 )
-
-var WORKERS_COUNT int = 0
 
 // Game map.
 // Coordinates formatted as:
@@ -16,7 +12,7 @@ var WORKERS_COUNT int = 0
 // 3
 type GameMap struct {
 	cellMap      [][]bool
-	changeEvents []*ChangeEvent
+	changeEvents []ChangeEvent
 }
 
 func (gameMap *GameMap) GetSize() (int, int) {
@@ -43,83 +39,26 @@ func (gameMap *GameMap) GetValue(width, height int) bool {
 
 //simple linear algorithm
 func (gameMap *GameMap) Update() {
-	_, height := gameMap.GetSize()
+	width, height := gameMap.GetSize()
 
-	rowsChan := make(chan int, height)
-	changesChan := make(chan *ChangeEvent)
-	finished := make(chan bool)
+	for i := 0; i < width; i++ {
+		for j := 0; j < height; j++ {
+			aliveNeighboursCount := gameMap.getAliveNeighboursCountEff(i, j)
 
-	var wg sync.WaitGroup
-	wg.Add(height) //every row to be handled
-	go waitForWorkFinished(finished, &wg)
-
-	createRowWorkers(gameMap, rowsChan, changesChan, &wg)
-	go addRowsWorks(height, rowsChan)
-
-	select {
-	case changeEvent := <-changesChan:
-		gameMap.addChange(changeEvent)
-	case <-finished:
-		break
+			cellAlive := gameMap.GetValue(i, j)
+			if cellAlive {
+				if !cellContinueToLive(aliveNeighboursCount) {
+					gameMap.addChange(i, j, false)
+				}
+			} else {
+				if aliveNeighboursCount == 3 {
+					gameMap.addChange(i, j, true)
+				}
+			}
+		}
 	}
 
 	gameMap.performAllChanges()
-}
-
-func waitForWorkFinished(finished chan bool, wg *sync.WaitGroup) {
-	wg.Wait()
-	finished <- true
-}
-
-func addRowsWorks(height int, rowsChan chan int) {
-	for rowNum := 0; rowNum < height; rowNum++ {
-		rowsChan <- rowNum
-	}
-}
-
-func createRowWorkers(gameMap *GameMap, rowsChan chan int, changesChan chan *ChangeEvent, wg *sync.WaitGroup) {
-	for i := 0; i < getWorkersCount(); i++ {
-		go rowWorker(gameMap, rowsChan, changesChan, wg)
-	}
-}
-
-func getWorkersCount() int {
-	if WORKERS_COUNT == 0 {
-		WORKERS_COUNT = runtime.NumCPU()
-	}
-
-	return WORKERS_COUNT
-}
-
-func rowWorker(gameMap *GameMap, rowsChan chan int, changesChan chan *ChangeEvent, wg *sync.WaitGroup) {
-	for rowNumber := range rowsChan {
-		handleRow(gameMap, rowNumber, changesChan)
-		wg.Done()
-	}
-}
-
-func handleRow(gameMap *GameMap, rowNum int, changesChan chan *ChangeEvent) {
-	row := gameMap.cellMap[rowNum]
-	rowLength := len(row)
-
-	for xCoordinate := 0; xCoordinate < rowLength; xCoordinate++ {
-		handleCell(gameMap, xCoordinate, rowNum, changesChan)
-	}
-}
-
-func handleCell(gameMap *GameMap, xCoordinate int, rowNum int, changesChan chan *ChangeEvent) {
-	aliveNeighboursCount := gameMap.getAliveNeighboursCountEff(xCoordinate, rowNum)
-
-	cellAlive := gameMap.GetValue(xCoordinate, rowNum)
-	if cellAlive {
-		if !cellContinueToLive(aliveNeighboursCount) {
-			changesChan <- &ChangeEvent{xCoordinate, rowNum, false}
-		}
-	} else {
-		if aliveNeighboursCount == 3 {
-			changesChan <- &ChangeEvent{xCoordinate, rowNum, true}
-		}
-	}
 }
 
 func (gameMap *GameMap) performAllChanges() {
@@ -129,10 +68,10 @@ func (gameMap *GameMap) performAllChanges() {
 	gameMap.changeEvents = nil
 }
 
-func (gameMap *GameMap) addChange(changeEvent *ChangeEvent) {
+func (gameMap *GameMap) addChange(width, height int, newValue bool) {
 	//TODO concurrent safety to be added
 	changeEvents := gameMap.changeEvents
-	changeEvents = append(changeEvents, changeEvent)
+	changeEvents = append(changeEvents, ChangeEvent{width, height, newValue})
 	gameMap.changeEvents = changeEvents
 }
 

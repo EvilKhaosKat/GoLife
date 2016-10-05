@@ -41,7 +41,7 @@ func (gameMap *GameMap) GetValue(width, height int) bool {
 	return gameMap.cellMap[height][width]
 }
 
-//simple linear algorithm
+//concurrent algorithm
 func (gameMap *GameMap) Update() {
 	_, height := gameMap.GetSize()
 
@@ -56,11 +56,14 @@ func (gameMap *GameMap) Update() {
 	createRowWorkers(gameMap, rowsChan, changesChan, &wg)
 	go addRowsWorks(height, rowsChan)
 
-	select {
-	case changeEvent := <-changesChan:
-		gameMap.addChange(changeEvent)
-	case <-finished:
-		break
+	changesLoop:
+	for {
+		select {
+		case changeEvent := <-changesChan:
+			gameMap.addChange(changeEvent)
+		case <-finished:
+			break changesLoop
+		}
 	}
 
 	gameMap.performAllChanges()
